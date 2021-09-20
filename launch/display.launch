@@ -1,0 +1,25 @@
+<launch>
+ <arg name="use_xacro" default="false"/>
+ <arg name="use_gui" default="false"/>
+
+ <arg if="$(arg use_xacro)" name="filename" default="robot.xacro"/>
+ <arg unless="$(arg use_xacro)" name="filename" default="urdf_from_xacro.urdf"/>
+
+ <arg name="file" default="$(find navvis_description)/urdf/$(arg filename)"/>
+
+ <param if="$(arg use_xacro)" name="robot_description" command="$(find xacro)/xacro.py --inorder $(arg file)"/>
+ <param unless="$(arg use_xacro)" name="robot_description" textfile="$(arg file)"/>
+
+ <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"/>
+
+ <node if="$(arg use_gui)" pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher"/>
+ <node if="$(arg use_gui)" pkg="tf2_ros" type="static_transform_publisher" name="wheel_left_publisher" args="0.0, 0.365, 0.2, -1.57, 0.0, 0.0, base, wheel_left"/>
+ <node if="$(arg use_gui)" pkg="tf2_ros" type="static_transform_publisher" name="wheel_right_publisher" args="0.0, -0.365, 0.2, -1.57, 0.0, 0.0, base, wheel_right"/>
+ <node if="$(arg use_gui)" pkg="tf2_ros" type="static_transform_publisher" name="wheel_center_publisher" args="0.0, -0.365, 0.2, -1.57, 0.0, 0.0, base, wheel_center"/>
+ <node unless="$(arg use_gui)" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" name="joint_state_publisher_gui"/>
+
+
+ <node pkg="rviz" type="rviz" name="rviz" args="-d $(find navvis_description)/config/config.rviz" required="true"/>
+
+ 
+</launch>
